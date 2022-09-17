@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:uber_driver/authentication/login_screen.dart';
 import 'package:uber_driver/authentication/signup_screen.dart';
+import 'package:uber_driver/global/global.dart';
 import 'package:uber_driver/mainScreens/main_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,12 +17,23 @@ class _SplashScreenState extends State<SplashScreen> {
 
   startTimer(){
     Timer(const Duration(seconds: 3), () async{
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (c) => LoginScreen()
-          )
-      );
+      if(await firebaseAuth.currentUser != null){
+        currentFirebaseUser = firebaseAuth.currentUser;
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (c) => MainScreen()
+            )
+        );
+      }
+      else{
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (c) => LoginScreen()
+            )
+        );
+      }
     });
   }
 

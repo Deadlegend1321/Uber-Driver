@@ -1,4 +1,8 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uber_driver/global/global.dart';
+import 'package:uber_driver/splashScreen/splash_screen.dart';
 
 class CarInfoScreen extends StatefulWidget {
   const CarInfoScreen({Key? key}) : super(key: key);
@@ -13,6 +17,20 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
   TextEditingController carColorTextEditingController = TextEditingController();
   List carTypeslist = ["uber-x", "uber-go", "bike"];
   String? selectedCarType;
+
+  saveCarInfo(){
+    Map driverCarInfoMap = {
+      "car_colour": carColorTextEditingController.text.trim(),
+      "car_number": carNumberTextEditingController.text.trim(),
+      "car_model": carModelTextEditingController.text.trim(),
+      "type": selectedCarType
+    };
+
+    DatabaseReference driversRef = FirebaseDatabase.instance.ref().child("drivers");
+    driversRef.child(currentFirebaseUser!.uid).child("car_details").set(driverCarInfoMap);
+    Fluttertoast.showToast(msg: "Car Details has been saved");
+    Navigator.push(context, MaterialPageRoute(builder: (c)=> SplashScreen()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,8 +91,8 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                     color: Colors.grey
                 ),
                 decoration: const InputDecoration(
-                    labelText: "Email",
-                    hintText: "xyz@gmail.com",
+                    labelText: "Car Number",
+                    hintText: "XY12 1234 1234",
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
                           color: Colors.grey
@@ -102,8 +120,8 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                     color: Colors.grey
                 ),
                 decoration: const InputDecoration(
-                    labelText: "Phone",
-                    hintText: "1234567890",
+                    labelText: "Car Color",
+                    hintText: "White",
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
                           color: Colors.grey
@@ -155,7 +173,12 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
               const SizedBox(height: 20,),
               ElevatedButton(
                   onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (c)=> CarInfoScreen()));
+                    if(carColorTextEditingController.text.isNotEmpty &&
+                    carModelTextEditingController.text.isNotEmpty &&
+                    carNumberTextEditingController.text.isNotEmpty &&
+                    selectedCarType != null){
+                      saveCarInfo();
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                       primary: Colors.white54
